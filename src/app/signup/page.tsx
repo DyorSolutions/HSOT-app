@@ -2,10 +2,10 @@
 
 import { useState, useEffect } from "react";
 import { useRouter } from "next/navigation";
-import { auth, db } from "@/lib/firebase"; // Import your Firebase setup
-import { createUserWithEmailAndPassword, fetchSignInMethodsForEmail } from "firebase/auth"; 
+import { auth, db } from "@/lib/firebase";
+import { createUserWithEmailAndPassword, fetchSignInMethodsForEmail } from "firebase/auth";
 import { doc, setDoc } from "firebase/firestore";
-import PasswordStrengthMeter from 'react-password-strength-bar'; // Import the strength meter
+import PasswordStrengthMeter from 'react-password-strength-bar';
 
 export default function SignupPage() {
   const router = useRouter();
@@ -13,27 +13,25 @@ export default function SignupPage() {
   const [password, setPassword] = useState("");
   const [displayName, setDisplayName] = useState("");
   const [error, setError] = useState("");
-  const [success, setSuccess] = useState("");  // State for success message
-  const [isSubmitting, setIsSubmitting] = useState(false);  // Prevent multiple form submissions
-  const [passwordStrength, setPasswordStrength] = useState(0); // Password strength score
-  const [passwordFeedback, setPasswordFeedback] = useState(""); // Feedback message
+  const [success, setSuccess] = useState("");
+  const [isSubmitting, setIsSubmitting] = useState(false);
+  const [passwordStrength, setPasswordStrength] = useState(0);
+  const [passwordFeedback, setPasswordFeedback] = useState("");
 
-  // Effect for handling redirect after success message
   useEffect(() => {
     if (success) {
       const timer = setTimeout(() => {
-        router.push("/dashboard");  // Redirect to the dashboard
+        router.push("/dashboard");
       }, 2000);
-      return () => clearTimeout(timer);  // Cleanup on unmount or when success changes
+      return () => clearTimeout(timer);
     }
   }, [success, router]);
 
   const handleSignUp = async (e: React.FormEvent) => {
     e.preventDefault();
-    setIsSubmitting(true);  // Disable submit button to prevent multiple submissions
+    setIsSubmitting(true);
 
     try {
-      // Check if the email is already in use
       const methods = await fetchSignInMethodsForEmail(auth, email);
       if (methods.length > 0) {
         setError("This email is already registered. Please log in or use a different email.");
@@ -41,11 +39,9 @@ export default function SignupPage() {
         return;
       }
 
-      // Proceed to create the user
       const userCredential = await createUserWithEmailAndPassword(auth, email, password);
       const user = userCredential.user;
 
-      // Create the user record in Firestore
       await setDoc(doc(db, "users", user.uid), {
         email: user.email,
         displayName,
@@ -53,29 +49,26 @@ export default function SignupPage() {
         createdAt: new Date().toISOString(),
       });
 
-      // Set success message and reset the form
       setSuccess("Account created successfully! Redirecting to your dashboard...");
-      setEmail("");  // Clear email input
-      setPassword("");  // Clear password input
-      setDisplayName("");  // Clear displayName input
+      setEmail("");
+      setPassword("");
+      setDisplayName("");
 
     } catch (err: any) {
       if (err.code === "auth/email-already-in-use") {
         setError("This email is already in use. Please log in or use a different email.");
       } else {
-        // Catch other errors, e.g., weak passwords
         setError(err.message);
       }
     }
 
-    setIsSubmitting(false);  // Re-enable the submit button after processing
+    setIsSubmitting(false);
   };
 
   return (
     <div className="p-6 max-w-md mx-auto">
       <h1 className="text-2xl font-bold mb-4">Sign Up</h1>
 
-      {/* Show success message if available */}
       {success && <p className="text-green-500 mb-2">{success}</p>}
 
       <form onSubmit={handleSignUp} className="space-y-4">
@@ -103,16 +96,29 @@ export default function SignupPage() {
           className="w-full px-4 py-2 rounded bg-gray-100 text-black"
           required
         />
-        <PasswordStrengthMeter password={password} /> {/* Include the password strength meter */}
-        {/* Display error message */}
+        <PasswordStrengthMeter password={password} />
         {error && <p className="text-red-500">{error}</p>}
         <button
           type="submit"
           className="w-full bg-blue-600 text-white py-2 rounded hover:bg-blue-700 transition"
-          disabled={isSubmitting}  // Disable the submit button when submitting
+          disabled={isSubmitting} // Disable the submit button when submitting
         >
           Sign Up
+          
         </button>
+
+        {/* Add the login redirect link */}
+      <div className="text-center">
+        <p>
+          Already have an account?{" "}
+          <a
+            href="/login"
+            className="text-blue-600 hover:underline"
+          >
+            Sign In
+          </a>
+        </p>
+      </div>
       </form>
     </div>
   );
