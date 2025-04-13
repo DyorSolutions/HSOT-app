@@ -110,6 +110,19 @@ export default function SignupPage() {
           Sign Up
         </button>
       </form>
+
+      {/* Link to Login Page */}
+      <div className="mt-4 text-center">
+        <p>
+          Already have an account?{" "}
+          <span
+            className="text-blue-500 cursor-pointer"
+            onClick={() => router.push("/login")}
+          >
+            Log in here
+          </span>
+        </p>
+      </div>
     </div>
   );
 }
