@@ -114,18 +114,6 @@ export default function SignupPage() {
           Sign Up
         </button>
       </form>
-
-      <div className="mt-4 text-center">
-        <p>
-          Already have an account?{" "}
-          <a
-            className="text-blue-500 cursor-pointer"
-            onClick={() => router.push("/login")}
-          >
-            Log in here
-          </a>
-        </p>
-      </div>
     </div>
   );
 }

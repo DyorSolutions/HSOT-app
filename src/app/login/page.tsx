@@ -66,7 +66,7 @@ export default function LoginPage() {
 
       {isSuccess && (
         <div className="mb-4">
-          <p className="text-green-500">Login successful! Redirecting to dashboard in 3 seconds...</p>
+          <p className="text-green-500">Login successful! Redirecting to dashboard...</p>
         </div>
       )}
 
@@ -118,5 +118,4 @@ export default function LoginPage() {
       </div>
     </div>
   );
-  
 }
