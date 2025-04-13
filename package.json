@@ -12,7 +12,9 @@
     "firebase": "^11.6.0",
     "next": "15.2.4",
     "react": "^19.0.0",
-    "react-dom": "^19.0.0"
+    "react-dom": "^19.0.0",
+    "react-password-strength-bar": "^0.4.1",
+    "zxcvbn": "^4.4.2"
   },
   "devDependencies": {
     "@eslint/eslintrc": "^3",

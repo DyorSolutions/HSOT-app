@@ -5,6 +5,7 @@ import { useRouter } from "next/navigation";
 import { auth, db } from "@/lib/firebase"; // Import your Firebase setup
 import { createUserWithEmailAndPassword, fetchSignInMethodsForEmail } from "firebase/auth"; 
 import { doc, setDoc } from "firebase/firestore";
+import PasswordStrengthMeter from 'react-password-strength-bar'; // Import the strength meter
 
 export default function SignupPage() {
   const router = useRouter();
@@ -14,6 +15,8 @@ export default function SignupPage() {
   const [error, setError] = useState("");
   const [success, setSuccess] = useState("");  // State for success message
   const [isSubmitting, setIsSubmitting] = useState(false);  // Prevent multiple form submissions
+  const [passwordStrength, setPasswordStrength] = useState(0); // Password strength score
+  const [passwordFeedback, setPasswordFeedback] = useState(""); // Feedback message
 
   // Effect for handling redirect after success message
   useEffect(() => {
@@ -100,6 +103,7 @@ export default function SignupPage() {
           className="w-full px-4 py-2 rounded bg-gray-100 text-black"
           required
         />
+        <PasswordStrengthMeter password={password} /> {/* Include the password strength meter */}
         {/* Display error message */}
         {error && <p className="text-red-500">{error}</p>}
         <button
@@ -110,6 +114,18 @@ export default function SignupPage() {
           Sign Up
         </button>
       </form>
+
+      <div className="mt-4 text-center">
+        <p>
+          Already have an account?{" "}
+          <a
+            className="text-blue-500 cursor-pointer"
+            onClick={() => router.push("/login")}
+          >
+            Log in here
+          </a>
+        </p>
+      </div>
     </div>
   );
 }
