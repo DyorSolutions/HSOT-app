@@ -1,22 +1,18 @@
-import "./globals.css";
-import { ReactNode } from "react";
-import { AuthProvider } from "@/context/AuthContext";
-import Navbar from "@/components/Navbar";
+import type { Metadata } from 'next';
+import { Inter } from 'next/font/google';
+import './globals.css';
 
-export const metadata = {
-  title: "HSOT",
-  description: "Homeschool On Track",
+const inter = Inter({ subsets: ['latin'] });
+
+export const metadata: Metadata = {
+  title: 'Homeschool On Track',
+  description: 'Track homeschool progress',
 };
 
-export default function RootLayout({ children }: { children: ReactNode }) {
+export default function RootLayout({ children }: { children: React.ReactNode }) {
   return (
     <html lang="en">
-      <body>
-        <AuthProvider>
-          <Navbar />
-          <main className="p-6">{children}</main>
-        </AuthProvider>
-      </body>
+      <body className={inter.className}>{children}</body>
     </html>
   );
 }
