@@ -19,7 +19,7 @@ export default function Login() {
     e.preventDefault();
     setLocalError(null);
     try {
-      await signInWithEmailAndPassword (auth, email, password);
+      await signInWithEmailAndPassword(auth, email, password);
       // Hook handles redirect, but add feedback
     } catch (err: any) {
       let msg = 'Login failed. Please try again.';
@@ -42,13 +42,13 @@ export default function Login() {
         />
         <input
           type="password"
-          value={password"
+          value={password}
           onChange={(e) => setPassword(e.target.value)}
           placeholder="Password"
           className="w-full p-2 mb-2 border rounded"
         />
         {(localError || authError) && <p className="mb-4 text-red-500">{localError || authError}</p>}
-        <button type="submit" className="w-full p-2 text-white bg-500 rounded">Login</button>
+        <button type="submit" className="w-full p-2 text-white bg-blue-500 rounded">Login</button>
       </form>
       {role && <p className="mt-4">Logged in as {role}</p>} // Added for admin feedback
     </div>
