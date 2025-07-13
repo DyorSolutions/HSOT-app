@@ -3,7 +3,7 @@
 import { useState, useEffect } from "react";
 import { getDocs, collection, doc, setDoc } from "firebase/firestore";
 import { db } from "@/lib/firebase";
-import { useAuth } from "@/lib/useAuth"; // Import useAuth
+import { useAuth } from "@/Ts/useAuth"; // Import useAuth
 import { useRouter } from "next/navigation"; // Import useRouter
 
 const AdminDashboard = () => {
