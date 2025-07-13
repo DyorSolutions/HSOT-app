@@ -1,25 +1,29 @@
-import { NextRequest, NextResponse } from "next/server";
+import { NextRequest, NextResponse } from 'next/server';
 
-export function middleware (req: NextRequest) {
-  // Assume you set a session cookie on login, e.g., in handleLogin: document.cookie = 'authToken = ' + await user.getIdToken();'
-  const token = req.cookies.get('authToken')?.value;
+export function middleware(req: NextRequest) {
+  const token = req.cookies.get('authToken')?.value; // Assuming you set this on login
 
-  const protectedPaths = ['/dashboard', '/my-students', '/students', '/subjects'];
-  if (protectedPaths.some(path => req.nextUrl.pathname.startsWith(path)) && !token) {
-    const url = req.nextUrl.clone();
-    url.pathname = '/login';
-    return NextResponse.redirect(url);
+  const url = req.nextUrl;
+
+  // Redirect root to login if not authenticated
+  if (url.pathname === '/' && !token) {
+    return NextResponse.redirect(new URL('/login', req.url));
   }
 
-  if (token && (req.nextUrl.pathname === '/login' || req.nextUrl.pathname === '/signup')) {
-    const url = req.nextUrl.clone();
-    url.pathname = '/dashboard';
-    return NextResponse.redirect(url);
+  // Existing protected paths logic
+  const protectedPaths = ['/dashboard', '/my-students', '/students', '/subjects'];
+  if (protectedPaths.some(path => url.pathname.startsWith(path)) && !token) {
+    return NextResponse.redirect(new URL('/login', req.url));
+  }
+
+  // Redirect authenticated users from auth pages to dashboard
+  if (token && (url.pathname === '/login' || url.pathname === '/signup' || url.pathname === '/')) {
+    return NextResponse.redirect(new URL('/dashboard', req.url));
   }
 
   return NextResponse.next();
 }
 
 export const config = {
-  matcher: ['/dashboard/:path*', '/my-students/:path*', '/students/:path*', '/subjects/:path*', '/login', '/signup']
+  matcher: ['/', '/dashboard/:path*', '/my-students/:path*', '/students/:path*', '/subjects/:path*', '/login', '/signup'],
 };

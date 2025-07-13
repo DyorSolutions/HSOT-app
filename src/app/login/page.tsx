@@ -4,6 +4,7 @@ import { useState } from 'react';
 import { signInWithEmailAndPassword } from 'firebase/auth';
 import { auth } from '@/lib/firebase';
 import { useRouter } from 'next/navigation';
+import Link from 'next/link';
 import { useAuth } from '@/context/AuthContext'; // Adjust path if needed
 
 export default function Login() {
@@ -11,7 +12,7 @@ export default function Login() {
   const [password, setPassword] = useState('');
   const [localError, setLocalError] = useState<string | null>(null);
   const router = useRouter();
-  const { error: authError, loading, role } = useAuth(); // For global state
+  const { error: authError, loading, role } = useAuth();
 
   if (loading) return <div className="flex items-center min-h-screen">Loading...</div>;
 
@@ -19,10 +20,11 @@ export default function Login() {
     e.preventDefault();
     setLocalError(null);
     try {
-      await signInWithEmailAndPassword(auth, email, password);
-      // Hook handles redirect, but add feedback
+      const { user } = await signInWithEmailAndPassword(auth, email, password);
+      document.cookie = `authToken=${await user.getIdToken()}; path=/;`; // Set for middleware
+      router.push('/dashboard');
     } catch (err: any) {
-      console.error('Login error:', err); // Log full error for dev console
+      console.error('Login error:', err);
       let msg = 'Login failed. Please try again.';
       if (err.code === 'auth/invalid-credential') msg = 'Invalid email or password.';
       if (err.code === 'auth/user-not-found') msg = 'No user found with this email.';
@@ -55,7 +57,10 @@ export default function Login() {
         {(localError || authError) && <p className="mb-4 text-red-500">{localError || authError}</p>}
         <button type="submit" className="w-full p-2 text-white bg-blue-500 rounded">Login</button>
       </form>
-      {role && <p className="mt-4">Logged in as {role}</p>} // Added for admin feedback
+      <p className="mt-4 text-sm">
+        Don't have an account? <Link href="/signup" className="text-blue-500 hover:underline">Sign up</Link>
+      </p>
+      {role && <p className="mt-2 text-sm">Logged in as {role}</p>}
     </div>
   );
 }

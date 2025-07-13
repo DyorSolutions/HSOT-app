@@ -1,0 +1,7 @@
+[
+   {
+     "origin": ["http://localhost:3000", "http://localhost:3000/*", "https://your-vercel-domain.vercel.app"],
+     "method": ["GET", "PUT", "POST"],
+     "maxAgeSeconds": 3600
+   }
+ ]
