@@ -4,7 +4,7 @@ import { useState } from 'react';
 import { signInWithEmailAndPassword } from 'firebase/auth';
 import { auth } from '@/lib/firebase';
 import { useRouter } from 'next/navigation';
-import { useAuth } from '../../Ts/useAuth'; // Adjust path if needed
+import { useAuth } from '@/context/AuthContext'; // Adjust path if needed
 
 export default function Login() {
   const [email, setEmail] = useState('');
@@ -22,9 +22,14 @@ export default function Login() {
       await signInWithEmailAndPassword(auth, email, password);
       // Hook handles redirect, but add feedback
     } catch (err: any) {
+      console.error('Login error:', err); // Log full error for dev console
       let msg = 'Login failed. Please try again.';
       if (err.code === 'auth/invalid-credential') msg = 'Invalid email or password.';
       if (err.code === 'auth/user-not-found') msg = 'No user found with this email.';
+      if (err.code === 'auth/wrong-password') msg = 'Incorrect password.';
+      if (err.code === 'auth/user-disabled') msg = 'User account is disabled.';
+      if (err.code === 'auth/network-request-failed') msg = 'Network error—check your connection.';
+      if (err.code === 'auth/too-many-requests') msg = 'Too many failed attempts. Try again later.';
       setLocalError(msg);
     }
   };
