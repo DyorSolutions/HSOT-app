@@ -1,44 +1,57 @@
-"use client";
-import React, { createContext, useState, useEffect, ReactNode, useContext } from "react";
-import { onAuthStateChanged, User } from "firebase/auth"; // Import Firebase auth functions
-import { auth } from "@/lib/firebase"; // Import the Firebase instance
+'use client'; // Client-side only
 
-// Define the shape of the context
+import { createContext, useContext, useState, useEffect, ReactNode } from 'react';
+import { auth, db } from '@/lib/firebase';
+import { onAuthStateChanged, User } from 'firebase/auth';
+import { doc, getDoc } from 'firebase/firestore';
+import { useRouter } from 'next/navigation';
+
 interface AuthContextType {
   user: User | null;
+  role: 'admin' | 'user' | null;
   loading: boolean;
+  error: string | null;
 }
 
-// Create the context
-export const AuthContext = createContext<AuthContextType | undefined>(undefined);
+const AuthContext = createContext<AuthContextType | undefined>(undefined);
 
-// Create the useAuth hook
-export const useAuth = () => {
-  const context = useContext(AuthContext);
-  if (!context) {
-    throw new Error("useAuth must be used within an AuthProvider");
-  }
-  return context;
-};
-
-export const AuthProvider = ({ children }: { children: ReactNode }) => {
+export function AuthProvider({ children }: { children: ReactNode }) {
   const [user, setUser] = useState<User | null>(null);
-  const [loading, setLoading] = useState<boolean>(true);
+  const [role, setRole] = useState<'admin' | 'user' | null>(null);
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState<string | null>(null);
+  const router = useRouter();
 
-  // Set up the authentication listener when the component mounts
   useEffect(() => {
-    const unsubscribe = onAuthStateChanged(auth, (user) => {
-      setUser(user);
-      setLoading(false); // Set loading to false once we know the auth state
+    const unsubscribe = onAuthStateChanged(auth, async (currentUser) => {
+      setUser(currentUser);
+      if (currentUser) {
+        try {
+          const userDoc = await getDoc(doc(db, 'users', currentUser.uid));
+          const userRole = userDoc.exists() ? userDoc.data()?.role : 'user';
+          setRole(userRole);
+        } catch (err) {
+          setError('Failed to load user data');
+          console.error(err);
+        }
+      }
+      setLoading(false);
     });
 
-    // Clean up the listener when the component unmounts
     return unsubscribe;
   }, []);
 
   return (
-    <AuthContext.Provider value={{ user, loading }}>
+    <AuthContext.Provider value={{ user, role, loading, error }}>
       {children}
     </AuthContext.Provider>
   );
+}
+
+export const useAuth = (): AuthContextType => {
+  const context = useContext(AuthContext);
+  if (!context) {
+    throw new Error('useAuth must be used within an AuthProvider');
+  }
+  return context;
 };
