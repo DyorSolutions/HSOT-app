@@ -4,11 +4,18 @@ import { useState } from 'react';
 import { ref, uploadBytes } from 'firebase/storage';
 import { collection, addDoc } from 'firebase/firestore';
 import { storage, db } from '@/lib/firebase';
-import { useAuth } from '@/context/AuthContext'; // Adjust path if needed
+import { useAuth } from '@/context/AuthContext';
+import { Button } from '@/components/ui/button';
+import { Input } from '@/components/ui/input';
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
+import { Textarea } from '@/components/ui/textarea';
+import { Alert, AlertDescription } from '@/components/ui/alert';
+import { Progress } from '@/components/ui/progress';
+import Image from 'next/image';
 
 interface UploadComponentProps {
-  studentId: string; // Required: For organizing in Storage/Firestore
-  onSuccess?: () => void; // Optional: Callback after upload
+  studentId: string;
+  onSuccess?: () => void;
 }
 
 export default function UploadComponent({ studentId, onSuccess }: UploadComponentProps) {
@@ -17,9 +24,10 @@ export default function UploadComponent({ studentId, onSuccess }: UploadComponen
   const [description, setDescription] = useState('');
   const [uploadError, setUploadError] = useState<string | null>(null);
   const [uploading, setUploading] = useState(false);
+  const [progress, setProgress] = useState(0);
   const { user } = useAuth();
 
-  if (!user) return <div>Please log in to upload.</div>;
+  if (!user) return <Alert><AlertDescription>Please log in to upload.</AlertDescription></Alert>;
 
   const handleUpload = async () => {
     if (!files || files.length === 0) {
@@ -29,9 +37,10 @@ export default function UploadComponent({ studentId, onSuccess }: UploadComponen
     setUploading(true);
     setUploadError(null);
     const timestamp = new Date().toISOString();
-
     try {
-      for (const file of Array.from(files)) {
+      const totalFiles = files.length;
+      for (let i = 0; i < totalFiles; i++) {
+        const file = files[i];
         const storageRef = ref(storage, `users/${user.uid}/students/${studentId}/${timestamp}-${file.name}`);
         await uploadBytes(storageRef, file);
         await addDoc(collection(db, 'work'), {
@@ -42,12 +51,13 @@ export default function UploadComponent({ studentId, onSuccess }: UploadComponen
           timestamp,
           path: storageRef.fullPath,
         });
+        setProgress(((i + 1) / totalFiles) * 100);
       }
       setFiles(null);
       setSubject('');
       setDescription('');
+      setProgress(0);
       if (onSuccess) onSuccess();
-      alert('Upload successful!'); // Or use a toast component
     } catch (err: any) {
       setUploadError(err.message || 'Upload failed.');
     } finally {
@@ -56,50 +66,39 @@ export default function UploadComponent({ studentId, onSuccess }: UploadComponen
   };
 
   return (
-    <div className="p-4 border rounded bg-white shadow-md">
-      <h3 className="mb-4 text-lg font-bold">Upload Student Work</h3>
-      <input
+    <div className="space-y-4">
+      <Input
         type="file"
         multiple
         accept="image/*,application/pdf"
-        capture="environment" // Mobile camera for on-the-go pics
+        capture="environment"
         onChange={(e) => setFiles(e.target.files)}
-        className="mb-4"
       />
-      <select
-        value={subject}
-        onChange={(e) => setSubject(e.target.value)}
-        className="w-full p-2 mb-4 border rounded"
-      >
-        <option value="">Select Subject</option>
-        <option value="math">Math</option>
-        <option value="science">Science</option>
-        <option value="nature-study">Nature Study</option>
-        {/* Add more as needed */}
-      </select>
-      <textarea
-        value={description}
-        onChange={(e) => setDescription(e.target.value)}
-        placeholder="What was learned? (e.g., outdoor activity details)"
-        className="w-full p-2 mb-4 border rounded"
-      />
-      {uploadError && <p className="mb-4 text-red-500">{uploadError}</p>}
-      <button
-        onClick={handleUpload}
-        disabled={uploading}
-        className="w-full p-2 text-white bg-blue-500 rounded disabled:bg-gray-400"
-      >
+      {files && Array.from(files).map((file, index) => (
+        <div key={index} className="relative w-24 h-24">
+          <Image src={URL.createObjectURL(file)} alt="preview" fill className="object-cover rounded" />
+        </div>
+      ))}
+      <Select onValueChange={setSubject} value={subject}>
+        <SelectTrigger>
+          <SelectValue placeholder="Select Subject" />
+        </SelectTrigger>
+        <SelectContent>
+          <SelectItem value="math">Math</SelectItem>
+          <SelectItem value="science">Science</SelectItem>
+          <SelectItem value="nature-study">Nature Study</SelectItem>
+        </SelectContent>
+      </Select>
+      <Textarea value={description} onChange={(e) => setDescription(e.target.value)} placeholder="What was learned?" />
+      {uploadError && (
+        <Alert variant="destructive">
+          <AlertDescription>{uploadError}</AlertDescription>
+        </Alert>
+      )}
+      {uploading && <Progress value={progress} className="w-full" />}
+      <Button onClick={handleUpload} disabled={uploading} className="w-full">
         {uploading ? 'Uploading...' : 'Upload Batch'}
-      </button>
+      </Button>
     </div>
   );
 }
-
-import { Progress } from '@/components/ui/progress';
-
-// Add [progress, setProgress] = useState(0);
-// In handleUpload, update progress (simple: setProgress((index + 1) / files.length * 100))
-// Add <Progress value={progress} className="mt-2" /> if uploading.
-// For preview: <div className="grid grid-cols-3 gap-2 mt-2">
-// {files && Array.from(files).map(file => <img src={URL.createObjectURL(file)} alt="preview" className="w-full h-auto rounded" />)}
-// </div>
