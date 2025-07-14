@@ -13,11 +13,12 @@ export default function Dashboard() {
 
   return (
     <div className="p-4">
-      <h1>Welcome to Dashboard, {user?.email}!</h1>
+      <h1 className="text-3xl font-bold text-blue-500">Welcome to Dashboard, {user?.email}!</h1>
       <p>Your role: {role}</p>
       <Link href="/my-students" className="text-blue-500 hover:underline">Manage Students</Link>
       <div className="mt-4">
         <LogoutButton />
+        
       </div>
     </div>
   );
