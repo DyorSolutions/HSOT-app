@@ -94,3 +94,12 @@ export default function UploadComponent({ studentId, onSuccess }: UploadComponen
     </div>
   );
 }
+
+import { Progress } from '@/components/ui/progress';
+
+// Add [progress, setProgress] = useState(0);
+// In handleUpload, update progress (simple: setProgress((index + 1) / files.length * 100))
+// Add <Progress value={progress} className="mt-2" /> if uploading.
+// For preview: <div className="grid grid-cols-3 gap-2 mt-2">
+// {files && Array.from(files).map(file => <img src={URL.createObjectURL(file)} alt="preview" className="w-full h-auto rounded" />)}
+// </div>

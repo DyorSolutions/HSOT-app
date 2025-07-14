@@ -1,19 +1,24 @@
-// src/components/Navbar.tsx
-import Link from "next/link";
+'use client';
 
-const Navbar = () => {
+import Link from 'next/link';
+import LogoutButton from '@/components/LogoutButton';
+import { useAuth } from '@/context/AuthContext';
+
+export default function Navbar() {
+  const { user } = useAuth();
+
+  if (!user) return null;
+
   return (
-    <nav className="bg-gray-800 p-4">
-      <div className="flex justify-between items-center">
-        <div className="text-white text-xl">HSOT</div>
-        <div className="hidden md:flex space-x-4">
-          <Link href="/" className="text-white">Home</Link>
-          <Link href="/my-students" className="text-white">My Students</Link>  {/* Add link here */}
-          <Link href="/login" className="text-white">Login</Link>
+    <nav className="bg-blue-500 p-4 text-white">
+      <div className="container mx-auto flex justify-between items-center">
+        <Link href="/dashboard" className="font-bold">HSOT</Link>
+        <div className="space-x-4">
+          <Link href="/dashboard" className="hover:underline">Dashboard</Link>
+          <Link href="/my-students" className="hover:underline">My Students</Link>
+          <LogoutButton />
         </div>
       </div>
     </nav>
   );
-};
-
-export default Navbar;
+}

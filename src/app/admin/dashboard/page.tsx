@@ -68,8 +68,7 @@ const AdminDashboard = () => {
 
   return (
     <div className="admin-dashboard p-6 max-w-4xl mx-auto">
-      <h1 className="text-3xl font-bold mb-6">Admin Dashboard</h1>
-
+<h1 className="text-6xl font-extrabold text-red-500 bg-yellow-200 p-4 rounded-lg">Welcome to Dashboard, {user?.email}!</h1>
       {/* Students List */}
       <section className="students-list mb-6">
         <h2 className="text-xl font-semibold mb-2">Students</h2>

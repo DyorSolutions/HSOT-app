@@ -27,3 +27,22 @@ export function middleware(req: NextRequest) {
 export const config = {
   matcher: ['/', '/dashboard/:path*', '/my-students/:path*', '/students/:path*', '/subjects/:path*', '/login', '/signup'],
 };
+
+
+if (token) {
+  try {
+    await adminAuth.verifyIdToken(token);
+  } catch (err) {
+    return NextResponse.redirect(new URL('/login', req.url));
+  }
+}
+
+import { adminAuth } from '@/lib/firebaseAdmin';
+
+if (token) {
+  try {
+    await adminAuth.verifyIdToken(token);
+  } catch (err) {
+    return NextResponse.redirect(new URL('/login', req.url));
+  }
+}
