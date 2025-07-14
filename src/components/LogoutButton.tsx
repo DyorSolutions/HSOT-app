@@ -1,25 +1,14 @@
 'use client';
 
-import { signOut } from 'firebase/auth';
-import { auth } from '@/lib/firebase';
-import { useRouter } from 'next/navigation';
+import { useAuth } from '@/context/AuthContext';
+import { Button } from '@/components/ui/button';
 
 export default function LogoutButton() {
-  const router = useRouter();
-
-  const handleLogout = async () => {
-    try {
-      await signOut(auth);
-      document.cookie = 'authToken=; path=/; expires=Thu, 01 Jan 1970 00:00:01 GMT;'; // Clear auth cookie
-      router.push('/login');
-    } catch (err) {
-      console.error('Logout error:', err);
-    }
-  };
+  const { logout } = useAuth();
 
   return (
-    <button onClick={handleLogout} className="p-2 text-white bg-red-500 rounded">
+    <Button variant="destructive" onClick={logout}>
       Logout
-    </button>
+    </Button>
   );
 }

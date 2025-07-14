@@ -2,26 +2,26 @@
 
 import { useAuth } from '@/context/AuthContext';
 import UploadComponent from '@/components/UploadComponent';
-import { Card, CardHeader, CardContent } from '@/components/ui/card';
+import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 
 export default function MyStudents() {
   const { loading, user } = useAuth();
 
-  if (loading) return <div className="flex items-center justify-center min-h-screen animate-spin">Loading...</div>;
+  if (loading) return <div className="flex items-center justify-center min-h-screen">Loading...</div>;
   if (!user) return <div className="p-4">Please log in.</div>;
 
+  // Mock students; replace with Firestore
   const students = [
-    { id: '1', name: 'Student 1' },
-    { id: '2', name: 'Student 2' },
-  ]; // Mock; replace with Firestore fetch
+    { id: 'example-student', name: 'Example Student' },
+  ];
 
   return (
-    <div className="p-4 space-y-6">
-      <h2 className="text-2xl font-bold">My Students</h2>
+    <div className="p-4 max-w-4xl mx-auto">
+      <h2 className="text-2xl font-bold mb-6">My Students</h2>
       {students.map((student) => (
-        <Card key={student.id}>
+        <Card key={student.id} className="mb-6">
           <CardHeader>
-            <h3 className="text-xl font-semibold">{student.name}</h3>
+            <CardTitle>{student.name}</CardTitle>
           </CardHeader>
           <CardContent>
             <UploadComponent studentId={student.id} />

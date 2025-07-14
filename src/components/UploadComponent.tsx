@@ -15,10 +15,9 @@ import Image from 'next/image';
 
 interface UploadComponentProps {
   studentId: string;
-  onSuccess?: () => void;
 }
 
-export default function UploadComponent({ studentId, onSuccess }: UploadComponentProps) {
+export default function UploadComponent({ studentId }: UploadComponentProps) {
   const [files, setFiles] = useState<FileList | null>(null);
   const [subject, setSubject] = useState('');
   const [description, setDescription] = useState('');
@@ -27,7 +26,7 @@ export default function UploadComponent({ studentId, onSuccess }: UploadComponen
   const [progress, setProgress] = useState(0);
   const { user } = useAuth();
 
-  if (!user) return <Alert><AlertDescription>Please log in to upload.</AlertDescription></Alert>;
+  if (!user) return <Alert variant="destructive"><AlertDescription>Please log in to upload.</AlertDescription></Alert>;
 
   const handleUpload = async () => {
     if (!files || files.length === 0) {
@@ -37,8 +36,8 @@ export default function UploadComponent({ studentId, onSuccess }: UploadComponen
     setUploading(true);
     setUploadError(null);
     const timestamp = new Date().toISOString();
+    const totalFiles = files.length;
     try {
-      const totalFiles = files.length;
       for (let i = 0; i < totalFiles; i++) {
         const file = files[i];
         const storageRef = ref(storage, `users/${user.uid}/students/${studentId}/${timestamp}-${file.name}`);
@@ -57,7 +56,7 @@ export default function UploadComponent({ studentId, onSuccess }: UploadComponen
       setSubject('');
       setDescription('');
       setProgress(0);
-      if (onSuccess) onSuccess();
+      alert('Upload successful!');
     } catch (err: any) {
       setUploadError(err.message || 'Upload failed.');
     } finally {
@@ -74,11 +73,15 @@ export default function UploadComponent({ studentId, onSuccess }: UploadComponen
         capture="environment"
         onChange={(e) => setFiles(e.target.files)}
       />
-      {files && Array.from(files).map((file, index) => (
-        <div key={index} className="relative w-24 h-24">
-          <Image src={URL.createObjectURL(file)} alt="preview" fill className="object-cover rounded" />
+      {files && (
+        <div className="grid grid-cols-3 gap-2">
+          {Array.from(files).map((file, index) => (
+            <div key={index} className="relative w-full h-32">
+              <Image src={URL.createObjectURL(file)} alt="preview" fill className="object-cover rounded" />
+            </div>
+          ))}
         </div>
-      ))}
+      )}
       <Select onValueChange={setSubject} value={subject}>
         <SelectTrigger>
           <SelectValue placeholder="Select Subject" />
@@ -95,7 +98,7 @@ export default function UploadComponent({ studentId, onSuccess }: UploadComponen
           <AlertDescription>{uploadError}</AlertDescription>
         </Alert>
       )}
-      {uploading && <Progress value={progress} className="w-full" />}
+      {uploading && <Progress value={progress} />}
       <Button onClick={handleUpload} disabled={uploading} className="w-full">
         {uploading ? 'Uploading...' : 'Upload Batch'}
       </Button>

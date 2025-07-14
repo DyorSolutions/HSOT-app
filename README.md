@@ -1,16 +1,25 @@
 # Homeschool On Track (HSOT)
 
-A web app for homeschool families to track progress, uploads, attendance, and generate transcripts.
+A web app for homeschool families to digitally organize, track, and manage student work and progress.
 
 ## Setup
-1. Clone repo.
-2. `npm i`
-3. Copy .env.local.example to .env.local, fill Firebase keys.
-4. `npm run dev`
+1. Clone the repo.
+2. Install dependencies: `npm i`
+3. Copy .env.local.example to .env.local and fill in Firebase keys.
+4. Run `npm run dev` for local development.
 
 ## Features
-- Auth with roles
-- Work uploads with tagging
-- Dashboard, student management
+- User authentication with roles (admin/guardian/student)
+- Student work uploads with tagging and timestamps
+- Dashboard and student management
+- Logout functionality
 
-Deploy on Vercel: Add env vars in settings.
+## Deployment
+Deploy on Vercel. Add Firebase env vars in Vercel settings.
+
+## Future
+- Transcript generation
+- Portfolio exports
+- AI grading
+
+Built with Next.js, Firebase, Tailwind, ShadCN.
